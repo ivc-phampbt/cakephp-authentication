@@ -48,9 +48,14 @@ class ArticlePolicy
      * @param \App\Model\Entity\Article $article
      * @return bool
      */
-    public function canDelete(IdentityInterface $user, Article $article)
+    public function canDelete(IdentityInterface $user, Article $article): Result
     {
-        return $user->getIdentifier() === $article->user_id;
+        $isAuthor = $this->isAuthor($user, $article);
+        if ($isAuthor) {
+            return new Result(true);
+        }
+
+        return new Result(false, 'Permission denied');
     }
 
     /**

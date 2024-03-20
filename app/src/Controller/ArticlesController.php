@@ -31,7 +31,11 @@ class ArticlesController extends AppController
     {
         $this->request->allowMethod(['get']);
         $this->Authorization->skipAuthorization();
-        $articles = $this->Articles->find('all');
+        $query = $this->Articles->find();
+        $articles = $query->select(['total_likes' => $query->func()->count('Likes.id')])
+            ->leftJoinWith('Likes')
+            ->group('Articles.id')
+            ->enableAutoFields(true);
 
         $this->set('articles', $articles);
         $this->viewBuilder()->setOption('serialize', ['articles']);
@@ -46,9 +50,14 @@ class ArticlesController extends AppController
     {
         $this->request->allowMethod(['get']);
         $this->Authorization->skipAuthorization();
-        $article = $this->Articles->get($id, [
-            'contain' => ['Users', 'Likes'],
-        ]);
+
+        $query = $this->Articles->find();
+        $article = $query->select(['total_likes' => $query->func()->count('Likes.id')])
+            ->leftJoinWith('Likes')
+            ->where(['Articles.id' => $id])
+            ->group('Articles.id')
+            ->enableAutoFields(true)
+            ->first();
 
         $this->set('article', $article);
         $this->viewBuilder()->setOption('serialize', ['article']);
