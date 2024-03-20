@@ -39,7 +39,7 @@ The application should now be accessible at http://localhost:34251
 ## How to check
 
 ### Authentication
-I created 2 accounts with the following information:
+I created 2 accounts with the following information (Please run the migration again if you have run it before):
 ```
 User1
 email: pham.bqt@gmail.com
