@@ -222,4 +222,4 @@ Authorization: <access token>
 }
 ```
 
-About [**All users can see like count on an article**], you can find them (total_likes) at [1, Retrieve All Articles (GET)](#1-retrieve-all-articles-get) or [2, Retrieve a Single Article (GET)](2-retrieve-a-single-article-get).
+About [**All users can see like count on an article**], you can find them (total_likes) at [1, Retrieve All Articles (GET)](#1-retrieve-all-articles-get) or [2, Retrieve a Single Article (GET)](#2-retrieve-a-single-article-get).
