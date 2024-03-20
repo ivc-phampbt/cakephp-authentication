@@ -7,13 +7,13 @@ use Cake\ORM\RulesChecker;
 use Cake\Validation\Validator;
 
 /**
- * Users Model
+ * Likes Model
  *
- * @property \App\Model\Table\ArticlesTable&\Cake\ORM\Association\HasMany $Articles
- * @property \App\Model\Table\LikesTable&\Cake\ORM\Association\HasMany $Likes
+ * @property \App\Model\Table\UsersTable&\Cake\ORM\Association\BelongsTo $Users
+ * @property \App\Model\Table\ArticlesTable&\Cake\ORM\Association\BelongsTo $Articles
  *
  */
-class UsersTable extends BaseTable
+class LikesTable extends BaseTable
 {
     /**
      * Initialize method
@@ -25,15 +25,17 @@ class UsersTable extends BaseTable
     {
         parent::initialize($config);
         $this->addBehavior('Timestamp');
-        $this->setTable('users');
-        $this->setDisplayField('email');
+        $this->setTable('likes');
+        $this->setDisplayField('id');
         $this->setPrimaryKey('id');
 
-        $this->hasMany('Articles', [
+        $this->belongsTo('Users', [
             'foreignKey' => 'user_id',
+            'joinType' => 'INNER',
         ]);
-        $this->hasMany('Likes', [
-            'foreignKey' => 'user_id',
+        $this->belongsTo('Articles', [
+            'foreignKey' => 'article_id',
+            'joinType' => 'INNER',
         ]);
     }
 
@@ -46,15 +48,12 @@ class UsersTable extends BaseTable
     public function validationDefault(Validator $validator): Validator
     {
         $validator
-            ->email('email')
-            ->requirePresence('email', 'create')
-            ->notEmptyString('email');
+            ->integer('user_id')
+            ->notEmptyString('user_id');
 
         $validator
-            ->scalar('password')
-            ->maxLength('password', 255)
-            ->requirePresence('password', 'create')
-            ->notEmptyString('password');
+            ->integer('article_id')
+            ->notEmptyString('article_id');
 
         return $validator;
     }
@@ -68,7 +67,8 @@ class UsersTable extends BaseTable
      */
     public function buildRules(RulesChecker $rules): RulesChecker
     {
-        $rules->add($rules->isUnique(['email']), ['errorField' => 'email']);
+        $rules->add($rules->existsIn('user_id', 'Users'), ['errorField' => 'user_id']);
+        $rules->add($rules->existsIn('article_id', 'Articles'), ['errorField' => 'article_id']);
 
         return $rules;
     }

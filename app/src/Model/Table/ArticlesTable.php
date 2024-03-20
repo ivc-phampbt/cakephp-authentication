@@ -7,13 +7,13 @@ use Cake\ORM\RulesChecker;
 use Cake\Validation\Validator;
 
 /**
- * Users Model
+ * Articles Model
  *
- * @property \App\Model\Table\ArticlesTable&\Cake\ORM\Association\HasMany $Articles
+ * @property \App\Model\Table\UsersTable&\Cake\ORM\Association\BelongsTo $Users
  * @property \App\Model\Table\LikesTable&\Cake\ORM\Association\HasMany $Likes
  *
  */
-class UsersTable extends BaseTable
+class ArticlesTable extends BaseTable
 {
     /**
      * Initialize method
@@ -24,16 +24,24 @@ class UsersTable extends BaseTable
     public function initialize(array $config): void
     {
         parent::initialize($config);
-        $this->addBehavior('Timestamp');
-        $this->setTable('users');
-        $this->setDisplayField('email');
+        $this->addBehavior('Timestamp', [
+            'events' => [
+                'Model.beforeSave' => [
+                    'created_at' => 'new',
+                    'updated_at' => 'always'
+                ]
+            ]
+        ]);
+        $this->setTable('articles');
+        $this->setDisplayField('title');
         $this->setPrimaryKey('id');
 
-        $this->hasMany('Articles', [
+        $this->belongsTo('Users', [
             'foreignKey' => 'user_id',
+            'joinType' => 'INNER',
         ]);
         $this->hasMany('Likes', [
-            'foreignKey' => 'user_id',
+            'foreignKey' => 'article_id',
         ]);
     }
 
@@ -46,16 +54,18 @@ class UsersTable extends BaseTable
     public function validationDefault(Validator $validator): Validator
     {
         $validator
-            ->email('email')
-            ->requirePresence('email', 'create')
-            ->notEmptyString('email');
+            ->integer('user_id')
+            ->notEmptyString('user_id');
 
         $validator
-            ->scalar('password')
-            ->maxLength('password', 255)
-            ->requirePresence('password', 'create')
-            ->notEmptyString('password');
+            ->scalar('title')
+            ->maxLength('title', 255)
+            ->requirePresence('title', 'create')
+            ->notEmptyString('title');
 
+        $validator
+            ->scalar('body')
+            ->allowEmptyString('body');
         return $validator;
     }
 
@@ -68,7 +78,7 @@ class UsersTable extends BaseTable
      */
     public function buildRules(RulesChecker $rules): RulesChecker
     {
-        $rules->add($rules->isUnique(['email']), ['errorField' => 'email']);
+        $rules->add($rules->existsIn('user_id', 'Users'), ['errorField' => 'user_id']);
 
         return $rules;
     }

@@ -15,8 +15,14 @@ use Firebase\JWT\JWT;
 class UsersController extends AppController
 {
 
+    public function initialize(): void
+    {
+        parent::initialize();
+    }
+
     public function beforeFilter(\Cake\Event\EventInterface $event)
     {
+        parent::beforeFilter($event);
         $this->Authentication->allowUnauthenticated(['login']);
     }
 
