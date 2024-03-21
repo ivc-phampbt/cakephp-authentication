@@ -51,7 +51,10 @@ pass: pass1234
 ```
 
 #### To get access token (login):
+* About Authentication feature, I use the [cakephp/authentication plugin](https://book.cakephp.org/authentication/2/en/index.html).
+* About Authorization feature, I use the [cakephp/authorization plugin](https://book.cakephp.org/authorization/2/en/index.html).
 
+Ex: How to get access token from this system.
 - Request:
 ```
 POST http://localhost:34251/login
@@ -74,6 +77,9 @@ Note: The access token validity period is 60 minutes.
 
 ### Article Management
 #### 1, Retrieve All Articles (GET).
+|Title|endpoints|remark|
+|---|---|---|
+|Retrieve All Articles (GET)|/articles.json|Can only be used by all users. <br>Users can see information about articles and the total number of likes for each article.|
 - Request:
 ```
 GET http://localhost:34251/articles.json
@@ -116,6 +122,10 @@ GET http://localhost:34251/articles.json
 }
 ```
 #### 2, Retrieve a Single Article (GET)
+|Title|endpoints|remark|
+|---|---|---|
+|Retrieve a Single Article (GET)|/articles/{id}.json|Can only be used by all users. <br>Users can see article information and the article's total number of likes.|
+
 In this example, I retrieve data from article table with id is 4.
 - Request:
 ```
@@ -137,6 +147,10 @@ GET http://localhost:34251/articles/4.json
 ```
 
 #### 3, Create an Article (POST)
+|Title|endpoints|remark|
+|---|---|---|
+|Create an Article (POST)|/articles.json|Can only be used by authenticated users.|
+
 - Request:
 ```
 POST http://localhost:34251/articles.json
@@ -162,8 +176,11 @@ Authorization: <access token>
 }
 ```
 #### 4, Update an Article (PUT)
-Update data for column title and body for an article with id is 6.
+|Title|endpoints|remark|
+|---|---|---|
+|Update an Article (PUT)|/articles/{id}.json|Can only be used by authenticated article writer users.|
 
+In this example, I update data for column title and body for an article with id is 6.
 - Request:
 ```
 PUT http://localhost:34251/articles/6.json
@@ -189,6 +206,10 @@ Authorization: <access token>
 }
 ```
 #### 5, Delete an Article (DELETE)
+|Title|endpoints|remark|
+|---|---|---|
+|Delete an Article (DELETE)|/articles/{id}.json|Can only be used by authenticated article writer users.|
+
 In this example, I delete an article with id is 6.
 - Request:
 ```
@@ -206,8 +227,22 @@ Authorization: <access token>
 
 
 ### Like Feature
+#### Table
+**likes**
+|column|type
+|---|---|
+|id|integer|
+|user_id|integer|
+|article_id|integer|
+|created_at|datetime|
+|updated_at|datetime|
 
-Like endpoint: _/articles/{article_id}/likes.json_
+|Title|endpoints|remark|
+|---|---|---|
+|Like an article (POST)|/articles/{article_id}/likes.json|Authenticated users can like all articles, including their own.<br>Authenticated users can like an article only once.<br>Authenticated users can’t cancel like|
+|See like count on an article(GET)|/articles/{article_id}/likes.json|All users can see like count on an article.|
+
+#### Like an article (POST).
 In this example, I like an article with id is 2.
 - Request:
 ```
@@ -222,4 +257,14 @@ Authorization: <access token>
 }
 ```
 
-About [**All users can see like count on an article**], you can find them (total_likes) at [1, Retrieve All Articles (GET)](#1-retrieve-all-articles-get) or [2, Retrieve a Single Article (GET)](#2-retrieve-a-single-article-get).
+#### See like count on an article(GET).
+- Request:
+```
+GET http://localhost:34251/articles/2/likes.json
+```
+- Response:
+```
+{
+  "total_likes": 2
+}
+```
