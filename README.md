@@ -237,6 +237,7 @@ Authorization: <access token>
 |created_at|datetime|
 |updated_at|datetime|
 
+#### Like Restful API Endpoints
 |Title|endpoints|remark|
 |---|---|---|
 |Like an article (POST)|/articles/{article_id}/likes.json|Authenticated users can like all articles, including their own.<br>Authenticated users can like an article only once.<br>Authenticated users can’t cancel like|
