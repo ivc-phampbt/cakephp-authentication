@@ -153,6 +153,7 @@ In this example, I retrieve data from the article table with id = 4.
 GET http://localhost:34251/articles/4.json
 ```
 - Response:<br>
+
 **- In case data exists.**
 ```
 HTTP Status Code: 200
