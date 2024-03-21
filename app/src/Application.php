@@ -16,6 +16,10 @@ declare(strict_types=1);
  */
 namespace App;
 
+use App\Service\IArticlesService;
+use App\Service\ILikesService;
+use App\Service\Impl\ArticlesService;
+use App\Service\Impl\LikesService;
 use Authentication\AuthenticationService;
 use Authentication\AuthenticationServiceInterface;
 use Authentication\AuthenticationServiceProviderInterface;
@@ -124,6 +128,8 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
      */
     public function services(ContainerInterface $container): void
     {
+        $container->add(IArticlesService::class, ArticlesService::class);
+        $container->add(ILikesService::class, LikesService::class);
     }
 
     /**

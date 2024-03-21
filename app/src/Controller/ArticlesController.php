@@ -2,7 +2,9 @@
 declare(strict_types=1);
 
 namespace App\Controller;
+use App\Service\IArticlesService;
 use Authorization\Exception\ForbiddenException;
+use Cake\Http\Exception\NotFoundException;
 use Cake\View\JsonView;
 
 /**
@@ -27,15 +29,12 @@ class ArticlesController extends AppController
      *
      * @return \Cake\Http\Response|null|void Renders view
      */
-    public function index()
+    public function index(IArticlesService $articlesService)
     {
         $this->request->allowMethod(['get']);
         $this->Authorization->skipAuthorization();
-        $query = $this->Articles->find();
-        $articles = $query->select(['total_likes' => $query->func()->count('Likes.id')])
-            ->leftJoinWith('Likes')
-            ->group('Articles.id')
-            ->enableAutoFields(true);
+
+        $articles = $articlesService->find();
 
         $this->set('articles', $articles);
         $this->viewBuilder()->setOption('serialize', ['articles']);
@@ -46,18 +45,13 @@ class ArticlesController extends AppController
      *
      * @param string|null $id Article id.
      */
-    public function view($id = null)
+    public function view(IArticlesService $articlesService)
     {
         $this->request->allowMethod(['get']);
         $this->Authorization->skipAuthorization();
 
-        $query = $this->Articles->find();
-        $article = $query->select(['total_likes' => $query->func()->count('Likes.id')])
-            ->leftJoinWith('Likes')
-            ->where(['Articles.id' => $id])
-            ->group('Articles.id')
-            ->enableAutoFields(true)
-            ->first();
+        $id = $this->request->getParam('id');
+        $article = $articlesService->findById($id);
 
         $this->set('article', $article);
         $this->viewBuilder()->setOption('serialize', ['article']);
@@ -66,34 +60,26 @@ class ArticlesController extends AppController
     /**
      * Add method
      */
-    public function add()
+    public function add(IArticlesService $articlesService)
     {
         $this->request->allowMethod(['post']);
+        $this->Authorization->skipAuthorization();
 
         $requestData = $this->request->getData();
         $requestData['user_id'] = $this->Authentication->getIdentity()->getIdentifier();
 
-        $article = $this->Articles->newEntity($requestData);
-        $this->Authorization->authorize($article);
+        $article = $articlesService->create($requestData);
 
-        $errors = [];
-        if ($article->hasErrors()) {
-            $errors = $article->getErrors();
+        $this->set([
+            'message' => $article->hasErrors()
+                ? __('The article could not be saved. Please, try again.')
+                : __('The article has been saved.') ,
+            'errors' => $article->getErrors(),
+            'article' => $article->hasErrors() ? [] : $article
+        ]);
 
-            $this->set([
-                'message' => __('The article could not be saved. Please, try again.'),
-                'errors' => $errors
-            ]);
-            $this->viewBuilder()->setOption('serialize', ['message', 'errors']);
-        } else {
-            $article = $this->Articles->save($article);
-
-            $this->set([
-                'message' => __('The article has been saved.'),
-                'article' => $article
-            ]);
-            $this->viewBuilder()->setOption('serialize', ['message', 'article']);
-        }
+        $this->viewBuilder()->setOption('serialize', ['message', 'errors' ,
+            $article->hasErrors() ? null : 'article']);
     }
 
     /**
@@ -101,10 +87,16 @@ class ArticlesController extends AppController
      *
      * @param string|null $id Article id.
      */
-    public function edit($id = null)
+    public function edit(IArticlesService $articlesService)
     {
         $this->request->allowMethod(['put']);
-        $article = $this->Articles->get($id);
+        $id = $this->request->getParam('id');
+
+        $article = $articlesService->findById($id);
+
+        if ($article == null) {
+            throw new NotFoundException();
+        }
 
         if (!$this->Authorization->can($article, 'edit')) {
             throw new ForbiddenException(null, "Permission deined");
@@ -113,7 +105,7 @@ class ArticlesController extends AppController
         $requestData = $this->request->getData();
         $requestData['user_id'] = $this->Authentication->getIdentity()->getIdentifier();
 
-        $article = $this->Articles->patchEntity($article, $requestData);
+        $article = $articlesService->update($id, $requestData);
 
         if ($article->hasErrors()) {
             $errors = $article->getErrors();
@@ -123,7 +115,6 @@ class ArticlesController extends AppController
             ]);
             $this->viewBuilder()->setOption('serialize', ['message', 'errors']);
         } else {
-            $article = $this->Articles->save($article);
 
             $this->set([
                 'message' => __('The article has been saved.'),
@@ -131,27 +122,28 @@ class ArticlesController extends AppController
             ]);
             $this->viewBuilder()->setOption('serialize', ['message', 'article']);
         }
-
     }
 
     /**
      * Delete method
      *
-     * @param string|null $id Article id.
-     * @return \Cake\Http\Response|null|void Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function delete($id = null)
+    public function delete(IArticlesService $articlesService)
     {
         $this->request->allowMethod(['delete']);
-        $article = $this->Articles->get($id);
+        $id = $this->request->getParam('id');
+        $article = $articlesService->findById($id);
+
+        if ($article == null) {
+            throw new NotFoundException();
+        }
 
         if (!$this->Authorization->can($article, 'edit')) {
             throw new ForbiddenException(null, "Permission deined");
         }
 
         $this->set([
-            'message' => $this->Articles->delete($article)
+            'message' => $articlesService->delete($id)
                 ? __('The article has been deleted.')
                 : __('The article could not be deleted. Please, try again.'),
         ]);

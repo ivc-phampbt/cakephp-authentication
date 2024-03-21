@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 namespace App\Controller;
+use App\Service\ILikesService;
 
 /**
  * Likes Controller
@@ -11,19 +12,25 @@ namespace App\Controller;
  */
 class LikesController extends AppController
 {
+    public function beforeFilter(\Cake\Event\EventInterface $event)
+    {
+        $this->Authentication->allowUnauthenticated(['index']);
+    }
     /**
      * Index method
      *
      * @return \Cake\Http\Response|null|void Renders view
      */
-    public function index()
+    public function index(ILikesService $likesService)
     {
-        $this->paginate = [
-            'contain' => ['Users', 'Articles'],
-        ];
-        $likes = $this->paginate($this->Likes);
+        $this->Authorization->skipAuthorization();
+        $articleId = $this->request->getParam('article_id');
+        $totalLikes = $likesService->totalLikes($articleId);
 
-        $this->set(compact('likes'));
+        $this->set([
+            'total_likes' => $totalLikes,
+        ]);
+        $this->viewBuilder()->setOption('serialize', ['total_likes']);
     }
 
     /**
@@ -31,7 +38,7 @@ class LikesController extends AppController
      *
      * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
      */
-    public function add()
+    public function add(ILikesService $likesService)
     {
         $this->request->allowMethod(['post']);
         $this->Authorization->skipAuthorization();
@@ -39,18 +46,13 @@ class LikesController extends AppController
         $articleId = $this->request->getParam('article_id');
         $userId =  $this->Authentication->getIdentity()->getIdentifier();
 
-        $like = $this->Likes->find('all')
-            ->where([
-                'article_id' => $articleId,
-                'user_id' => $userId
-            ])
-            ->first();
+        $hasLike = $likesService->hasLike($userId, $articleId);
 
-        if (empty($like)) {
-            $like =  $this->Likes->newEntity(['article_id' => $articleId, 'user_id' => $userId]);
-            $message = $this->Likes->save($like) ? "Like success!!!" : "Like failed!!!";
-        } else {
+        if ($hasLike) {
             $message ="You have liked this article!";
+        } else {
+            $like = $likesService->create(['article_id' => $articleId, 'user_id' => $userId]);
+            $message = ($like === false || $like->hasErrors()) ?  "Like failed!!!" : "Like success!!!";
         }
 
         $this->set([
