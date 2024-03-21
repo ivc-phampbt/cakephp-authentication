@@ -45,7 +45,9 @@ class UsersController extends AppController
                 ];
             } else {
                 $this->response = $this->response->withStatus(401);
-                $json = [];
+                $json = [
+                    "message" => __('The Username or Password is Incorrect')
+                ];
             }
 
             $this->RequestHandler->renderAs($this, 'json');

@@ -53,6 +53,10 @@ class ArticlesController extends AppController
         $id = $this->request->getParam('id');
         $article = $articlesService->findById($id);
 
+        if (empty($article)) {
+            throw new NotFoundException();
+        }
+
         $this->set('article', $article);
         $this->viewBuilder()->setOption('serialize', ['article']);
     }
