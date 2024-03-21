@@ -19,7 +19,7 @@ class CreateFirstUser extends AbstractMigration
         $user = [
             'id' => 1,
             'email' => 'pham.bqt@gmail.com',
-            'password' =>  (new DefaultPasswordHasher)->hash('pass1234'),
+            'password' =>  (new DefaultPasswordHasher)->hash('P@ss1234tai'),
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s'),
         ];
