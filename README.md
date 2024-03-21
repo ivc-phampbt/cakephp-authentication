@@ -176,6 +176,11 @@ Authorization: <access token>
   }
 }
 ```
+**Note:**
+In this function, we also implemented the below validation checks:
+* Validate the requirements of the request parameters.
+* Validate the max length of the request parameters.
+
 #### 4, Update an Article (PUT)
 |Title|endpoints|remark|
 |---|---|---|
@@ -206,6 +211,12 @@ Authorization: <access token>
   }
 }
 ```
+**Note:**
+In this function, we also implemented the below validation checks:
+* Validate the requirements of the request parameters.
+* Validate the max length of the request parameters.
+* Checking the ID existing in DB before updating.
+
 #### 5, Delete an Article (DELETE)
 |Title|endpoints|remark|
 |---|---|---|
@@ -225,7 +236,9 @@ Authorization: <access token>
 }
 ```
 
-
+**Note:**
+In this function, we also implemented the below validation check:
+* Checking the ID existing in DB before deleting.
 
 ### Like Feature
 #### Additional Table for the Like Feature
@@ -258,6 +271,9 @@ Authorization: <access token>
   "message": "Like success!!!"
 }
 ```
+**Note:**
+In this function, we also implemented the below validation check:
+* Checking the ID existing in DB before updating.
 
 #### 2, See like count on an article(GET).
 - Request:
