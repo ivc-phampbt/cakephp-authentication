@@ -43,11 +43,11 @@ I created 2 accounts with the following information (Please run the migration ag
 ```
 User1
 email: pham.bqt@gmail.com
-pass: pass1234
+pass: P@ss1234tai
 
 User2
 email: pham.bqt2@gmail.com
-pass: pass1234
+pass: P@ss1234tai2
 ```
 
 #### To get access token (login):
@@ -60,7 +60,7 @@ Ex: How to get access token from this system.
 POST http://localhost:34251/login
 {
     "email": "pham.bqt@gmail.com",
-    "password": "pass1234"
+    "password": "P@ss1234tai"
 }
 ```
 - Response:
