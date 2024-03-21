@@ -200,6 +200,9 @@ Authorization: <access token>
 ```
 - Response:
 ```
+HTTP Status Code: 200
+```
+```
 {
   "message": "The article has been saved.",
   "article": {
@@ -235,6 +238,9 @@ Authorization: <access token>
 ```
 - Response:
 ```
+HTTP Status Code: 200
+```
+```
 {
   "message": "The article has been saved.",
   "article": {
@@ -266,6 +272,9 @@ Authorization: <access token>
 ```
 
 - Response:
+```
+HTTP Status Code: 200
+```
 ```
 {
   "message": "The article has been deleted."
@@ -303,6 +312,9 @@ Authorization: <access token>
 
 - Response:
 ```
+HTTP Status Code: 200
+```
+```
 {
   "message": "Like success!!!"
 }
@@ -317,6 +329,9 @@ In this function, we also implemented the below validation check:
 GET http://localhost:34251/articles/2/likes.json
 ```
 - Response:
+```
+HTTP Status Code: 200
+```
 ```
 {
   "total_likes": 2
