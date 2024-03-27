@@ -52,8 +52,12 @@ return function (RouteBuilder $routes): void {
     $routes->setExtensions(['json', 'xml']);
 
     $routes->scope('/', function (RouteBuilder $builder): void {
-        $builder->setExtensions(['json']);
-        $builder->connect('/login', ['controller' => 'Users', 'action' => 'login']);
+        $builder->scope('/api', function($builder) {
+            $builder->setExtensions(['json']);
+            $builder->connect('/login.json', ['controller' => 'Users', 'action' => 'login']);
+        });
+        $builder->connect('/login', ['controller' => 'Users', 'action' => 'webLogin']);
+        $builder->connect('/logout', ['controller' => 'Users', 'action' => 'logout']);
         /*
          * Here, we are connecting '/' (base path) to a controller called 'Pages',
          * its action called 'display', and we pass a param to select the view file

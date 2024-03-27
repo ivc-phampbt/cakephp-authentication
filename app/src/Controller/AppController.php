@@ -46,7 +46,7 @@ class AppController extends Controller
         $this->loadComponent('Authentication.Authentication');
         $this->loadComponent('Authorization.Authorization', [
             'skipAuthorization' => [
-                'login',
+                'login','webLogin', 'logout'
             ]
         ]);
         /*
