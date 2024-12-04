@@ -151,11 +151,13 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
     }
 
     public function getAuthenticationService(ServerRequestInterface $request): AuthenticationServiceInterface
-    {
-        $service = new AuthenticationService([
-            'unauthenticatedRedirect' => Router::url('/login'),
-            'queryParam' => 'redirect',
-        ]);
+     {
+        // $service = new AuthenticationService([
+        //     'unauthenticatedRedirect' => Router::url('/login'),
+        //     'queryParam' => 'redirect',
+        // ]);
+
+        $service = new AuthenticationService();
         $fields = [
             IdentifierInterface::CREDENTIAL_USERNAME => 'email',
             IdentifierInterface::CREDENTIAL_PASSWORD => 'password'
@@ -163,7 +165,8 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
         $service->loadIdentifier('Authentication.JwtSubject');
         $service->loadIdentifier('Authentication.Password', compact('fields'));
 
-        $service->loadAuthenticator('Authentication.Session');
+        // $service->loadAuthenticator('Authentication.Session');
+
         $service->loadAuthenticator('Authentication.Form', [
             'fields' => $fields,
             'loginUrl' => [

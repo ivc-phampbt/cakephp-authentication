@@ -47,17 +47,13 @@ return function (RouteBuilder $routes): void {
      * inconsistently cased URLs when used with `{plugin}`, `{controller}` and
      * `{action}` markers.
      */
+    $routes->setExtensions(['json', 'xml']);
     $routes->setRouteClass(DashedRoute::class);
 
-    $routes->setExtensions(['json', 'xml']);
-
     $routes->scope('/', function (RouteBuilder $builder): void {
-        $builder->scope('/api', function($builder) {
-            $builder->setExtensions(['json']);
-            $builder->connect('/login.json', ['controller' => 'Users', 'action' => 'login']);
-        });
         $builder->connect('/login', ['controller' => 'Users', 'action' => 'webLogin']);
         $builder->connect('/logout', ['controller' => 'Users', 'action' => 'logout']);
+       // $builder->connect('/api/login', ['controller' => 'Users', 'action' => 'login']);
         /*
          * Here, we are connecting '/' (base path) to a controller called 'Pages',
          * its action called 'display', and we pass a param to select the view file
@@ -70,24 +66,21 @@ return function (RouteBuilder $routes): void {
          */
         $builder->connect('/pages/*', 'Pages::display');
 
-        $builder->resources('Articles', function(RouteBuilder $routes) {
+
+
+        $builder->fallbacks();
+    });
+
+    $routes->scope('/api', function (RouteBuilder $routes): void {
+        $routes->setRouteClass(DashedRoute::class);
+
+        $routes->setExtensions(['json', 'xml']);
+
+        $routes->connect('/login', ['controller' => 'Users', 'action' => 'login']);
+        $routes->resources('Articles', function(RouteBuilder $routes) {
             $routes->resources('Likes');
         });
-
-        /*
-         * Connect catchall routes for all controllers.
-         *
-         * The `fallbacks` method is a shortcut for
-         *
-         * ```
-         * $builder->connect('/{controller}', ['action' => 'index']);
-         * $builder->connect('/{controller}/{action}/*', []);
-         * ```
-         *
-         * You can remove these routes once you've connected the
-         * routes you want in your application.
-         */
-        $builder->fallbacks();
+        $routes->fallbacks();
     });
 
     /*
